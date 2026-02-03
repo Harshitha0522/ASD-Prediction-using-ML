@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('auth.login') }} - {{ t('home.title') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('home') }}" class="navbar-brand">{{ t('home.title') }}</a>
+            <div class="navbar-right">
+                <ul class="navbar-nav">
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                </ul>
+
+                {% if current_user.is_authenticated %}
+                    <div class="navbar-user-dropdown" id="navUserDropdown">
+                        <button class="navbar-user-btn">{{ current_user.username }} ▾</button>
+                        <ul class="navbar-user-menu">
+                            <li><a href="{{ url_for('user_info') }}">My Profile</a></li>
+                            <li><a href="{{ url_for('retraining_monitor') }}">Status</a></li>
+                            <li><a href="{{ url_for('history') }}">History</a></li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="center-box">
+            <h2>{{ t('auth.login') }}</h2>
+            
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash error">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">{{ t('auth.username') }}</label>
+                    <input type="text" id="username" name="username" placeholder="{{ t('auth.username') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">{{ t('auth.password') }}</label>
+                    <input type="password" id="password" name="password" placeholder="{{ t('auth.password') }}" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">{{ t('auth.login_button') }}</button>
+            </form>
+
+            <div class="divider"></div>
+            <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ASD Prediction App. All rights reserved.</p>
+    </footer>
+</body>
+</html>

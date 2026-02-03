@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('form.age') }} - {{ t('home.title') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('home') }}" class="navbar-brand">{{ t('home.title') }}</a>
+            <div class="navbar-right">
+                <ul class="navbar-nav">
+                    <li><a href="{{ url_for('logout') }}" class="navbar-logout">Logout</a></li>
+                </ul>
+
+                {% if current_user.is_authenticated %}
+                    <div class="navbar-user-dropdown" id="navUserDropdown">
+                        <button class="navbar-user-btn">{{ current_user.username }} ▾</button>
+                        <ul class="navbar-user-menu">
+                            <li><a href="{{ url_for('user_info') }}">My Profile</a></li>
+                            <li><a href="{{ url_for('retraining_monitor') }}">Status</a></li>
+                            <li><a href="{{ url_for('history') }}">History</a></li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="center-box">
+            <h2>{{ t('form.age') }} &amp; Info</h2>
+            <p class="text-muted">{{ t('questionnaire.instructions') }}</p>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="age">{{ t('form.age') }} (years)</label>
+                    <input type="number" id="age" name="age" min="0" max="120" placeholder="Enter age" required value="{{ session.get('age') or (current_user.age if current_user.age is not none else '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">{{ t('form.gender') }}</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">-- Select Gender --</option>
+                        <option value="Male" {% if (session.get('gender') == 'Male') or (current_user.gender == 'Male') %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if (session.get('gender') == 'Female') or (current_user.gender == 'Female') %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if (session.get('gender') == 'Other') or (current_user.gender == 'Other') %}selected{% endif %}>Other</option>
+                        <option value="Prefer not to say" {% if (session.get('gender') == 'Prefer not to say') or (current_user.gender == 'Prefer not to say') %}selected{% endif %}>Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ethnicity">{{ t('form.ethnicity') }}</label>
+                    <input type="text" id="ethnicity" name="ethnicity" placeholder="{{ t('form.ethnicity') }}" required>
+                </div>
+
+                <!-- Jaundice question removed as requested -->
+                    <label for="used_app_before">{{ t('form.used_app') }}</label>
+                    <select id="used_app_before" name="used_app_before" required>
+                        <option value="">-- Select --</option>
+                        <option value="Yes" {% if (session.get('used_app_before') == 'Yes') or (current_user.used_app_before == 'Yes') %}selected{% endif %}>Yes</option>
+                        <option value="No" {% if (session.get('used_app_before') == 'No') or (current_user.used_app_before == 'No') %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="relation">{{ t('form.relation') }}</label>
+                    <select id="relation" name="relation" required>
+                        <option value="">-- Select --</option>
+                        <option value="Parent" {% if (session.get('relation') == 'Parent') or (current_user.relation == 'Parent') %}selected{% endif %}>Parent / Guardian</option>
+                        <option value="Self" {% if (session.get('relation') == 'Self') or (current_user.relation == 'Self') %}selected{% endif %}>Self</option>
+                        <option value="Relative" {% if (session.get('relation') == 'Relative') or (current_user.relation == 'Relative') %}selected{% endif %}>Relative</option>
+                        <option value="Healthcare Provider" {% if (session.get('relation') == 'Healthcare Provider') or (current_user.relation == 'Healthcare Provider') %}selected{% endif %}>Healthcare Provider</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">{{ t('form.next') }}</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ASD Prediction App. All rights reserved.</p>
+    </footer>
+</body>
+</html>

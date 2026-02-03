@@ -1,0 +1,55 @@
+{
+  "model_name": "asd_model",
+  "version": "1.0.0",
+  "release_date": "2025-12-19T11:07:01.604068",
+  "git_commit": "",
+  "git_tag": "",
+  "python_version": "3.8+",
+  "sklearn_version": "1.0.0+",
+  "model_type": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": null,
+    "min_samples_split": 2,
+    "min_samples_leaf": 1,
+    "random_state": 42
+  },
+  "training": {
+    "dataset_size": 0,
+    "features": 5,
+    "feature_names": [
+      "Social",
+      "Repetitive",
+      "Emotional",
+      "Sensory",
+      "Solitude"
+    ],
+    "feature_scaling": "StandardScaler",
+    "test_size": 0.2,
+    "random_state": 42
+  },
+  "performance": {
+    "accuracy": 0.0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "roc_auc": 0.0,
+    "confusion_matrix": null,
+    "cross_val_scores": []
+  },
+  "classes": [
+    0.0,
+    1.0
+  ],
+  "artifact": {
+    "filename": "asd_model.joblib",
+    "size_mb": 0.0,
+    "checksum_sha256": "",
+    "storage_location": "github_releases",
+    "download_url": ""
+  },
+  "status": "active",
+  "notes": "Initial model version",
+  "maintainer": "ASD Prediction Team",
+  "schema_version": "2.0"
+}

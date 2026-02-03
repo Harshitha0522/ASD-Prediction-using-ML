@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ASD Prediction - Age-aware autism spectrum disorder screening tool">
+    <title>{{ t('home.title') }} - {{ t('home.subtitle') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('home') }}" class="navbar-brand">🧠 {{ t('home.title', None, 'ASD Prediction') }}</a>
+            <div class="navbar-right">
+                <ul class="navbar-nav">
+                    <li><a href="{{ url_for('home') }}">{{ t('nav.home') }}</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('history') }}">{{ t('nav.history') }}</a></li>
+                        <li><a href="{{ url_for('logout') }}" class="navbar-logout">{{ t('nav.logout') }}</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                    {% endif %}
+                </ul>
+
+                {% if current_user.is_authenticated %}
+                    <div class="navbar-user-dropdown" id="navUserDropdown">
+                        <button class="navbar-user-btn">{{ current_user.username }} ▾</button>
+                        <ul class="navbar-user-menu">
+                            <li><a href="{{ url_for('user_info') }}">My Profile</a></li>
+                            <li><a href="{{ url_for('retraining_monitor') }}">Status</a></li>
+                            <li><a href="{{ url_for('history') }}">History</a></li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="center-box">
+            <h1>{{ t('messages.welcome') }}</h1>
+            <p>{{ t('home.description') }}</p>
+
+            <div style="margin-top: 1rem; margin-bottom: 1rem; text-align: center;">
+                <label for="languageSelectHome" style="font-weight:600; display:block; margin-bottom:0.5rem;">{{ t('settings.language') }}</label>
+                <select id="languageSelectHome" style="padding:0.6rem 0.8rem; border-radius:0.5rem; border:1px solid var(--border-color);">
+                    {% for code, name in supported_languages.items() %}
+                        <option value="{{ code }}" {% if code == current_language %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 0.5rem;">
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary">Create Account</a>
+            </div>
+        </div>
+
+        <div style="max-width: 900px; margin: 3rem auto;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">How It Works</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                <div class="card">
+                    <h3>📝 Register</h3>
+                    <p>Create a secure account with your email and a strong password.</p>
+                </div>
+                <div class="card">
+                    <h3>👤 Provide Info</h3>
+                    <p>Tell us about the person being screened (age, gender, relation).</p>
+                </div>
+                <div class="card">
+                    <h3>❓ Answer Questions</h3>
+                    <p>Complete a tailored questionnaire based on age group.</p>
+                </div>
+                <div class="card">
+                    <h3>📊 Get Results</h3>
+                    <p>Receive an ASD prediction score and interpretation.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ASD Prediction App. For screening purposes only. Always consult with healthcare professionals.</p>
+    </footer>
+    <script>
+        (function(){
+            const sel = document.getElementById('languageSelectHome');
+            if(!sel) return;
+            sel.addEventListener('change', function(){
+                const code = sel.value;
+                if(!code) return;
+                window.location.href = '/set_language/' + encodeURIComponent(code);
+            });
+        })();
+    </script>
+</body>
+</html>

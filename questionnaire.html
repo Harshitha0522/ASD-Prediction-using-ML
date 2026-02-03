@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('questionnaire.title') }} - {{ t('home.title') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('home') }}" class="navbar-brand">🧠 {{ t('home.title') }}</a>
+            <div class="navbar-right">
+                <ul class="navbar-nav">
+                    <li><a href="{{ url_for('logout') }}" class="navbar-logout">Logout</a></li>
+                </ul>
+
+                {% if current_user.is_authenticated %}
+                    <div class="navbar-user-dropdown" id="navUserDropdown">
+                        <button class="navbar-user-btn">{{ current_user.username }} ▾</button>
+                        <ul class="navbar-user-menu">
+                            <li><a href="{{ url_for('user_info') }}">My Profile</a></li>
+                            <li><a href="{{ url_for('retraining_monitor') }}">Status</a></li>
+                            <li><a href="{{ url_for('history') }}">History</a></li>
+                            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="center-box questionnaire-center">
+            <h2>{{ t('questionnaire.title') }}</h2>
+            <p class="text-muted">{{ t('questionnaire.instructions') }} ({{ questions|length }})</p>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;" id="progressFill"></div>
+                </div>
+                <p class="progress-text"><span id="currentQuestion">0</span> / {{ questions|length }} completed</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('questionnaire') }}" id="questionnaireForm">
+                <!-- hidden field holds total questions so JS doesn't need inline Jinja expressions -->
+                <input type="hidden" id="totalQuestionsInput" value="{{ questions|length }}">
+                <div class="questions-grid">
+                    {% for i, question in questions|enumerate %}
+                        <div class="question-group" data-question="{{ i + 1 }}">
+                            <label class="question-text">{{ i + 1 }}. {{ question }}</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="q{{ i + 1 }}" value="Yes">
+                                    <span>{{ t('questionnaire.yes') }}</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="q{{ i + 1 }}" value="No">
+                                    <span>{{ t('questionnaire.no') }}</span>
+                                </label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions" style="justify-content: flex-end;">
+                    <div id="errorMsg" style="color: var(--danger-color); margin-right: 1rem; display:none;"></div>
+                    <button type="button" id="nextBtn" class="btn btn-primary">{{ t('form.next') }} →</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="display:none; margin-left: 0.5rem;">{{ t('questionnaire.submit_test') }}</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 ASD Prediction App. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('questionnaireForm');
+            const progressFill = document.getElementById('progressFill');
+            const currentQuestionSpan = document.getElementById('currentQuestion');
+            const questionGroups = Array.from(document.querySelectorAll('.question-group'));
+            const totalQuestions = questionGroups.length || Number(document.getElementById('totalQuestionsInput')?.value || 0);
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            let currentIndex = 0;
+
+            function showQuestion(index) {
+                questionGroups.forEach((g, i) => {
+                    g.style.display = (i === index) ? 'block' : 'none';
+                });
+                // Update next/submit visibility
+                if (index === totalQuestions - 1) {
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'inline-block';
+                } else {
+                    nextBtn.style.display = 'inline-block';
+                    submitBtn.style.display = 'none';
+                }
+                updateProgress();
+                errorMsg.style.display = 'none';
+            }
+
+            function updateProgress() {
+                const answered = form.querySelectorAll('input[type="radio"]:checked').length;
+                const percentage = totalQuestions > 0 ? (answered / totalQuestions) * 100 : 0;
+                progressFill.style.width = percentage + '%';
+                currentQuestionSpan.textContent = answered;
+            }
+
+            nextBtn.addEventListener('click', function () {
+                errorMsg.style.display = 'none';
+                const currentGroup = questionGroups[currentIndex];
+                const checked = currentGroup.querySelector('input[type="radio"]:checked');
+                if (!checked) {
+                    errorMsg.textContent = 'Please answer this question before continuing.';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                // move to next
+                if (currentIndex < totalQuestions - 1) {
+                    currentIndex += 1;
+                    showQuestion(currentIndex);
+                }
+            });
+
+            // Final submit: ensure all questions answered
+            form.addEventListener('submit', function (e) {
+                const answered = form.querySelectorAll('input[type="radio"]:checked').length;
+                if (answered < totalQuestions) {
+                    e.preventDefault();
+                    errorMsg.textContent = 'Please answer all questions before submitting.';
+                    errorMsg.style.display = 'block';
+                    // jump to first unanswered question
+                    for (let i = 0; i < questionGroups.length; i++) {
+                        if (!questionGroups[i].querySelector('input[type="radio"]:checked')) {
+                            currentIndex = i;
+                            showQuestion(currentIndex);
+                            break;
+                        }
+                    }
+                }
+            });
+
+            // update progress when user changes any radio
+            form.addEventListener('change', updateProgress);
+
+            // initialize
+            if (totalQuestions > 0) showQuestion(0);
+        });
+    </script>
+</body>
+</html>
